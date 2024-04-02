@@ -1,53 +1,40 @@
-/*
-Sample code for vulnerable type: Improper Restriction of XML External Entity Reference
-CWE : CWE-611
-Description : the xml parser parses the data directly received from the user, here the setting of setDisableDefaultEntityResolution 
-to true before parsing the user input would make the code secure.
-*/
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <iostream>
+#include <stdio.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
-const char* dosDtdContent = R"(
-<!ENTITY dos "&dos;&dos;&dos;&dos;&dos;&dos;&dos;&dos;&dos;&dos;">
-)";
+void parse_xml(const char* filename) {
+    xmlDocPtr doc;
+    xmlNodePtr root;
 
-void parseXmlData(const char* xmlData) {
-    try {
-        // Initialize Xerces-C++
-        xercesc::XMLPlatformUtils::Initialize();
-
-        // Create XercesDOMParser
-        xercesc::XercesDOMParser *parser = new xercesc::XercesDOMParser();
-
-        // Parse XML data
-        parser->parse(xmlData); //sink
-
-        // Get the document (unreachable in case of DoS)
-        xercesc::DOMDocument* xmlDoc = parser->getDocument();
-
-        // Cleanup
-        delete parser;
-
-        // Terminate Xerces-C++
-        xercesc::XMLPlatformUtils::Terminate();
-    } catch (const xercesc::XMLException& e) {
-        std::cerr << "Exception: " << xercesc::XMLString::transcode(e.getMessage()) << std::endl;
+    // Parse the XML file
+    doc = xmlReadFile(filename, NULL, 0);
+    if (doc == NULL) {
+        printf("Error: Unable to parse XML file.\n");
+        return;
     }
+
+    // Get the root element
+    root = xmlDocGetRootElement(doc);
+    if (root == NULL) {
+        printf("Error: Empty XML file.\n");
+        xmlFreeDoc(doc);
+        return;
+    }
+
+    // Traverse the XML tree and process nodes (not shown in this example)
+
+    // Free the XML document
+    xmlFreeDoc(doc);
 }
 
-int main() {
-    // Prompt user for XML data
-    std::cout << "Enter XML data: ";
-    std::string userXmlData;
-    std::getline(std::cin, userXmlData); //source
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        printf("Usage: %s <xml_file>\n", argv[0]);
+        return 1;
+    }
 
-    // Append DoS content to user-provided XML data
-    userXmlData;
-
-    // Parse user-provided XML data with potential DoS
-    parseXmlData(userXmlData.c_str());
+    // Vulnerability: Directly passing user input to parse_xml function
+    parse_xml(argv[1]);
 
     return 0;
 }
