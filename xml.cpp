@@ -1,30 +1,53 @@
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <cstring>
+#include <sqlite3.h>
 
-void processXml(const char* filename) {
-    std::ifstream file(filename);
-    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+// Example 1: Dynamic SQL Query with Concatenation
+void dynamicQueryConcatenation(const std::string& userInput) {
+    std::string query = "SELECT * FROM users WHERE username='" + userInput + "'";
+    // Execute query...
+}
 
-    // Pattern 1: Loading XML file without disabling external entities
-    // This code does not properly restrict external entity references, leading to XXE vulnerability
-    std::cout << "Pattern 1: Loading XML file without disabling external entities" << std::endl;
-    std::cout << "Content from " << filename << ": " << content << std::endl;
+// Example 2: Unescaped Special Characters
+void unescapedSpecialCharacters(const char* userInput) {
+    char query[100];
+    sprintf(query, "SELECT * FROM users WHERE username='%s'", userInput);
+    // Execute query...
+}
 
-    // Pattern 2: Parsing XML data without disabling external entities
-    // This code parses XML data without properly restricting external entity references, leading to XXE vulnerability
-    std::cout << "Pattern 2: Parsing XML data without disabling external entities" << std::endl;
-    std::cout << "Parsing XML data:" << std::endl;
-    // Assume XML parsing code is here
+// Example 3: No Prepared Statements or Parameterized Queries
+void dynamicQueryExecution(sqlite3* db, const std::string& userInput) {
+    std::string query = "SELECT * FROM users WHERE username='" + userInput + "'";
+    sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr);
+}
 
-    // Pattern 3: Using vulnerable XML processing libraries
-    // This code uses XML processing libraries that are vulnerable to XXE attacks
-    std::cout << "Pattern 3: Using vulnerable XML processing libraries" << std::endl;
-    // Assume vulnerable XML processing library usage is here
+// Example 4: Insufficient Input Validation
+void insufficientInputValidation() {
+    std::string username;
+    std::cout << "Enter username: ";
+    std::cin >> username;
+    // Use username in SQL query without validation...
 }
 
 int main() {
-    // Example usage: Process XML file
-    processXml("example.xml");
+    // Open SQLite database
+    sqlite3* db;
+    int rc = sqlite3_open(":memory:", &db);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Error opening SQLite database: " << sqlite3_errmsg(db) << std::endl;
+        return 1;
+    }
+
+    // Execute SQL injection vulnerable functions
+    std::string userInput = "admin' OR '1'='1";
+    dynamicQueryConcatenation(userInput);
+    unescapedSpecialCharacters(userInput.c_str());
+    dynamicQueryExecution(db, userInput);
+    insufficientInputValidation();
+
+    // Close SQLite database
+    sqlite3_close(db);
+
     return 0;
 }
