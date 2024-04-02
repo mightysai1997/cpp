@@ -1,35 +1,30 @@
 #include <iostream>
-#include <cstring>
-#include <cstdlib>
+#include <fstream>
+#include <string>
 
-// Pattern 1: Returning the address of a local variable directly
-char* getName1() {
-    char name[100];
-    std::strcpy(name, "John Doe");
-    return name; // Vulnerability: Returning the address of a local variable directly
-}
+void processXml(const char* filename) {
+    std::ifstream file(filename);
+    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
-// Pattern 2: Returning the address of a dynamically allocated variable directly
-char* getName2() {
-    char* name = new char[100]; // Dynamically allocating memory
-    std::strcpy(name, "Jane Smith");
-    return name; // Vulnerability: Returning the address of dynamically allocated memory directly
+    // Pattern 1: Loading XML file without disabling external entities
+    // This code does not properly restrict external entity references, leading to XXE vulnerability
+    std::cout << "Pattern 1: Loading XML file without disabling external entities" << std::endl;
+    std::cout << "Content from " << filename << ": " << content << std::endl;
+
+    // Pattern 2: Parsing XML data without disabling external entities
+    // This code parses XML data without properly restricting external entity references, leading to XXE vulnerability
+    std::cout << "Pattern 2: Parsing XML data without disabling external entities" << std::endl;
+    std::cout << "Parsing XML data:" << std::endl;
+    // Assume XML parsing code is here
+
+    // Pattern 3: Using vulnerable XML processing libraries
+    // This code uses XML processing libraries that are vulnerable to XXE attacks
+    std::cout << "Pattern 3: Using vulnerable XML processing libraries" << std::endl;
+    // Assume vulnerable XML processing library usage is here
 }
 
 int main() {
-    char last_name[20];
-
-    // Pattern 1: Using std::strcpy without checking bounds
-    std::strcpy(last_name, getName1()); // Sink: Copying data from the returned address to 'last_name'
-    std::cout << "Pattern 1 - Last name: " << last_name << std::endl;
-
-    // Pattern 2: Using std::strcpy with dynamically allocated memory
-    char* ptr = getName2(); // Assigning the returned address to a pointer
-    std::strcpy(last_name, ptr); // Sink: Copying data from the returned address to 'last_name'
-    std::cout << "Pattern 2 - Last name: " << last_name << std::endl;
-
-    // Freeing dynamically allocated memory
-    delete[] ptr;
-
+    // Example usage: Process XML file
+    processXml("example.xml");
     return 0;
 }
