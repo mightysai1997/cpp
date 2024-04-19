@@ -1,8 +1,5 @@
-#include "xercesc/parsers/SAXParser.hpp"
+#include "libxml/parser.h"
 
 void parse() {
-  SAXParser* SAXparser = new SAXParser();
-  SAXparser->setDisableDefaultEntityResolution(false); // Noncompliant
-
-  SAXparser->parse(xmlFile);
+  xmlDocPtr doc = xmlReadFile(xmlFile, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_NOENT); // Noncompliant
 }
