@@ -1,21 +1,24 @@
 #include <iostream>
-#include <string>
-#include <sqlite3.h>
-
-void executeQuery(sqlite3* db, const std::string& userInput) {
-    std::string query = "SELECT * FROM users WHERE username='" + userInput + "'";
-    sqlite3_exec(db, query.c_str(), nullptr, nullptr, nullptr);
-}
+#include "tinyxml2.h"
 
 int main() {
-    sqlite3* db;
-    int rc = sqlite3_open(":memory:", &db);
-    if (rc != SQLITE_OK) {
-        std::cerr << "Error opening SQLite database: " << sqlite3_errmsg(db) << std::endl;
+    std::string data;
+    std::cin >> data;
+
+    tinyxml2::XMLDocument doc;
+    doc.UseExternalEntities(false); // Disable external entities
+    if (doc.Parse(data.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Error: Failed to parse XML document." << std::endl;
         return 1;
     }
-    std::string userInput = "admin'; --";
-    executeQuery(db, userInput);
-    sqlite3_close(db);
+
+    const char* name = doc.FirstChildElement("name")->GetText();
+    if (name == nullptr) {
+        std::cerr << "Error: Name element not found." << std::endl;
+        return 1;
+    }
+
+    std::cout << name << std::endl;
+
     return 0;
 }
