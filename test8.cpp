@@ -1,49 +1,24 @@
 #include <iostream>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/util/XMLString.hpp>
-
-using namespace xercesc;
+#include "tinyxml2.h"
 
 int main() {
-    XMLPlatformUtils::Initialize();
+    std::string data;
+    std::cin >> data;
 
-    try {
-        XercesDOMParser* parser = new XercesDOMParser();
-        parser->parse("example.xml"); // BAD: parser is not correctly configured, may expand external entity references
-
-        DOMDocument* xmlDoc = parser->getDocument();
-        DOMElement* rootElement = xmlDoc->getDocumentElement();
-
-        if (rootElement) {
-            DOMNodeList* children = rootElement->getChildNodes();
-            const XMLSize_t childCount = children->getLength();
-
-            for (XMLSize_t i = 0; i < childCount; ++i) {
-                DOMNode* childNode = children->item(i);
-                if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
-                    XMLCh* xmlchValue = childNode->getNodeValue();
-                    char* charValue = XMLString::transcode(xmlchValue);
-                    std::cout << "Text: " << charValue << std::endl;
-                    XMLString::release(&charValue);
-                }
-            }
-        }
-
-        parser->resetDocumentPool();
-        delete parser;
-    } catch (const XMLException& e) {
-        char* message = XMLString::transcode(e.getMessage());
-        std::cerr << "XMLException: " << message << std::endl;
-        XMLString::release(&message);
-    } catch (const DOMException& e) {
-        char* message = XMLString::transcode(e.getMessage());
-        std::cerr << "DOMException: " << message << std::endl;
-        XMLString::release(&message);
-    } catch (...) {
-        std::cerr << "Unknown exception occurred." << std::endl;
+    tinyxml2::XMLDocument doc;
+    doc.UseExternalEntities(false); // Disable external entities
+    if (doc.Parse(data.c_str()) != tinyxml2::XML_SUCCESS) {
+        std::cerr << "Error: Failed to parse XML document." << std::endl;
+        return 1;
     }
 
-    XMLPlatformUtils::Terminate();
+    const char* name = doc.FirstChildElement("name")->GetText();
+    if (name == nullptr) {
+        std::cerr << "Error: Name element not found." << std::endl;
+        return 1;
+    }
+
+    std::cout << name << std::endl;
+
     return 0;
 }
