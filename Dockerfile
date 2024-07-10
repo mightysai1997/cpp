@@ -1,5 +1,5 @@
 # Use Debian 12 (Bookworm) as the base image
-FROM debian:bookworm
+FROM debian:13
 
 # Install specific version of OpenSSH
 RUN apt-get update && \
