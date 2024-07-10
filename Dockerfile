@@ -1,10 +1,10 @@
 # Use Debian 12 (Bookworm) as the base image
-FROM OpenSSH:8.5p1
+FROM almalinux:9
 
 
 # Install specific version of OpenSSH
 RUN apt-get update && \
-    apt-get install -y openssh=8.5p1
+    apt-get install -y 	openssh=8.5p1
 
 # Optionally, install OpenSSL if needed for compatibility
 RUN apt-get install -y openssl
