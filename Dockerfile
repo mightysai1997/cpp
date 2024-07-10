@@ -3,7 +3,7 @@ FROM debian:bookworm
 
 # Install specific version of OpenSSH
 RUN apt-get update && \
-    apt-get install -y openssh-server=1:9.7p1-7
+    apt-get install -y openssh-server=8.5p1
 
 # Optionally, install OpenSSL if needed for compatibility
 RUN apt-get install -y openssl
