@@ -4,7 +4,7 @@ FROM almalinux:9
 
 # Install specific version of OpenSSH
 RUN apt-get update && \
-    apt-get install -y 	openssh=8.5p1
+    apt-get install -y 	openssh=0:8.7p1-38.el9_4.1
 
 # Optionally, install OpenSSL if needed for compatibility
 RUN apt-get install -y openssl
