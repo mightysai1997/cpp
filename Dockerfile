@@ -1,5 +1,5 @@
 # Use Debian 12 (Bookworm) as the base image
-FROM openssh:8.5p1
+FROM OpenSSH:8.5p1
 
 
 # Install specific version of OpenSSH
