@@ -1,19 +1,8 @@
-# Use Debian 12 (Bookworm) as the base image
-FROM almalinux:9
+FROM debian:bullseye-slim
 
-
-# Install specific version of OpenSSH
+# Install necessary packages
 RUN apt-get update && \
-    apt-get install -y 	openssh=0:8.7p1-38.el9_4.1
+    apt-get install -y bookworm=1:9.2p1-2+deb12u2
 
-# Optionally, install OpenSSL if needed for compatibility
-RUN apt-get install -y openssl
-
-# Generate host keys for SSH (if not already generated)
-RUN ssh-keygen -A
-
-# Expose SSH port
-EXPOSE 22
-
-# Start SSH service
-CMD ["/usr/sbin/sshd", "-D"]
+# Save the container as an image
+CMD ["bash"]
